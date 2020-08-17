@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>FastAPI Authentication with Google OAuth - Part 1 | slatebit.com</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="FastAPI Authentication with Google OAuth - Part 1" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<meta property="og:description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<link rel="canonical" href="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
+<meta property="og:url" content="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
+<meta property="og:site_name" content="slatebit.com" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-16T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Using Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI Authentication with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://www.slatebit.com/feed.xml" title="slatebit.com" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-42486869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>FastAPI Authentication with Google OAuth - Part 1 | slatebit.com</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="FastAPI Authentication with Google OAuth - Part 1" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<meta property="og:description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<link rel="canonical" href="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
+<meta property="og:url" content="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
+<meta property="og:site_name" content="slatebit.com" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-16T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Using Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI Authentication with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://www.slatebit.com/feed.xml" title="slatebit.com" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-42486869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">slatebit.com</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">FastAPI Authentication with Google OAuth - Part 1</h1><p class="page-description">Using Google OAuth as your authentication layer in FastAPI.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-16T00:00:00-05:00" itemprop="datePublished">
+        Aug 16, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#fastapi">fastapi</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#google">google</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#oauth">oauth</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/kmcentush/site/master?filepath=_notebooks%2F2020-08-16-fastapi_google_oauth_part1.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/kmcentush/site/blob/master/_notebooks/2020-08-16-fastapi_google_oauth_part1.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Background">Background </a></li>
+<li class="toc-entry toc-h2"><a href="#Google-OAuth-Credentials">Google OAuth Credentials </a></li>
+<li class="toc-entry toc-h2"><a href="#FastAPI">FastAPI </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Imports">Imports </a></li>
+<li class="toc-entry toc-h3"><a href="#FastAPI-Setup">FastAPI Setup </a></li>
+<li class="toc-entry toc-h3"><a href="#Google-OAuth-Implementation">Google OAuth Implementation </a></li>
+<li class="toc-entry toc-h3"><a href="#Protected-Docs">Protected Docs </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Credits">Credits </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-08-16-fastapi_google_oauth_part1.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Background">
+<a class="anchor" href="#Background" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background<a class="anchor-link" href="#Background"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Coming soon.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Google-OAuth-Credentials">
+<a class="anchor" href="#Google-OAuth-Credentials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google OAuth Credentials<a class="anchor-link" href="#Google-OAuth-Credentials"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Coming soon.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="FastAPI">
+<a class="anchor" href="#FastAPI" aria-hidden="true"><span class="octicon octicon-link"></span></a>FastAPI<a class="anchor-link" href="#FastAPI"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Imports">
+<a class="anchor" href="#Imports" aria-hidden="true"><span class="octicon octicon-link"></span></a>Imports<a class="anchor-link" href="#Imports"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At the top of our Python file, we have our imports.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span> <span class="nn">fastapi.openapi.docs</span> <span class="kn">import</span> <span class="n">get_swagger_ui_html</span>
+<span class="kn">from</span> <span class="nn">fastapi.openapi.utils</span> <span class="kn">import</span> <span class="n">get_openapi</span>
+
+<span class="kn">from</span> <span class="nn">starlette.config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">starlette.requests</span> <span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span> <span class="nn">starlette.middleware.sessions</span> <span class="kn">import</span> <span class="n">SessionMiddleware</span>
+<span class="kn">from</span> <span class="nn">starlette.responses</span> <span class="kn">import</span> <span class="n">HTMLResponse</span><span class="p">,</span> <span class="n">JSONResponse</span><span class="p">,</span> <span class="n">RedirectResponse</span>
+
+<span class="kn">from</span> <span class="nn">authlib.integrations.starlette_client</span> <span class="kn">import</span> <span class="n">OAuth</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The first <code>Optional</code> and <code>FastAPI</code> imports are standard among FastAPI applications. I want to explicitly call out <code>Depends</code> and <code>HTTPException</code>, which will be used to validate a user's login credentials prior to an API call.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>Starlette</code> and <code>AuthLib</code> imports are the key to our Google OAuth implementation. They'll handle all of the heavy lifting, specifically the redirect URI generation and callback handling. Props to their developers as they make our implementation a breeze!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="FastAPI-Setup">
+<a class="anchor" href="#FastAPI-Setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>FastAPI Setup<a class="anchor-link" href="#FastAPI-Setup"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we initialize our <code>FastAPI</code> instance with a root homepage. I've disabled the default generated documentation because I plan to protect it behind our new user authentication layer later. If the user is not logged in, the pay will display a login link. If the user is logged in, the page will display their email address as well as links to the documentation and logout.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">docs_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">redoc_url</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SessionMiddleware</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="s1">'!secret'</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'user'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'&lt;pre&gt;Email: </span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&lt;br&gt;'</span>
+            <span class="s1">'&lt;a href="/docs"&gt;documentation&lt;/a&gt;&lt;br&gt;'</span>
+            <span class="s1">'&lt;a href="/logout"&gt;logout&lt;/a&gt;'</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="s1">'&lt;a href="/login"&gt;login&lt;/a&gt;'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Rather than saving our authentication to a cookie manually, I've opted to use Starlettes's <code>SessionMiddleware</code>. I specified a secret key that will be used to encode/decode the cookie. In actual applications, I highly recommended using a more secure key and saving it to an environment/config file. Hardcoding secrets, keys, database credentials, etc. in your files is both bad practice and a security risk.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>FastAPI has good <a href="https://fastapi.tiangolo.com/tutorial/middleware/">documentation</a> on middleware, and the key thing to note is that it can perform operations on requests prior to being passed through to the rest of the application as well before delivering responses. Starlette's <code>SessionMiddleware</code> <a href="https://www.starlette.io/middleware/#sessionmiddleware">documentation</a> explains how it utilizes this technique to add a signed cookie to the user session that is readable but not modifiable. Still confused about what middleware is? Check out the diagram below.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://miro.medium.com/max/1358/1*4nJJgPOnlJwD6s-7ygqgTg.jpeg" width="600">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Image source: <a href="https://medium.com/@tony_starkk/laravel-5-8-middleware-tutorial-with-example-2019-9f5069b8c3cc">link</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Google-OAuth-Implementation">
+<a class="anchor" href="#Google-OAuth-Implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google OAuth Implementation<a class="anchor-link" href="#Google-OAuth-Implementation"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With <code>AuthLib</code>, it doesn't take much work to implement Google OAuth into our FastAPI application. After loading our client ID and client secret from our configuration file, we register it with the following scopes:</p>
+<ul>
+<li>
+<code>openid</code>: required by Google's OpenID Connect API</li>
+<li>
+<code>email</code>: grants the application access to the user's email address</li>
+<li>
+<code>profile</code>: grants the applicattion acess to the user's profile, such as name and profile picture link</li>
+</ul>
+<p>For more information on the allowed scopes, please check out Google's <a href="https://developers.google.com/identity/protocols/oauth2/openid-connect">documentation</a>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Initialize our OAuth instance from the client ID and client secret specified in our .env file</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="s1">'.env'</span><span class="p">)</span>
+<span class="n">oauth</span> <span class="o">=</span> <span class="n">OAuth</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="n">CONF_URL</span> <span class="o">=</span> <span class="s1">'https://accounts.google.com/.well-known/openid-configuration'</span>
+<span class="n">oauth</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">'google'</span><span class="p">,</span>
+    <span class="n">server_metadata_url</span><span class="o">=</span><span class="n">CONF_URL</span><span class="p">,</span>
+    <span class="n">client_kwargs</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">'scope'</span><span class="p">:</span> <span class="s1">'openid email profile'</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/login'</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">'authentication'</span><span class="p">])</span>  <span class="c1"># Tag it as "authentication" for our docs</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="c1"># Redirect Google OAuth back to our application</span>
+    <span class="n">redirect_uri</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">url_for</span><span class="p">(</span><span class="s1">'auth'</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">oauth</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">authorize_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/auth'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">auth</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="c1"># Perform Google OAuth</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">oauth</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">authorize_access_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">oauth</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">parse_id_token</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+
+    <span class="c1"># Save the user</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s1">'user'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'/'</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/logout'</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">'authentication'</span><span class="p">])</span>  <span class="c1"># Tag it as "authentication" for our docs</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="c1"># Remove the user</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'user'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'/'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With our OAuth registered, we next define three endpoints: <code>login</code>, <code>auth</code>, and <code>logout</code>. They do exactly what their names suggest. <code>login</code> redirects to Google's sign-in page and then back to our FastAPI application once the user is logged in. Next, <code>auth</code> handles this incoming user access token and saves the user to a cookie thanks to our <code>SessionMiddleware</code> from earlier. Lastly, <code>logout</code> clears the user cookie from the session and resets our application back to the start.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At this point, we have functioning Google OAuth in our FastAPI application! By starting up our FastAPI application and heading to <a href="http://localhost:8000/">http://localhost:8000/</a> (this is the default url from the <code>uvicorn</code> library; see their <a href="https://www.uvicorn.org/">documentation</a>), we should see the following:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/login.png" width="480">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Clicking the "login" link will take us to the Google OAuth sigin-in page.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/authorized.png" width="480">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After signing in, we'll be redirected back to our application. Notice that the home page now shows the link to the documentation as well as the the logout link. If you click the logout link, you'll be redirected back to where we started. If you click the documentation link, you'll get a dead link.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/dead_docs.png" width="480">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That's because after disabled FastAPI's autogenerated documenation, we never implemented it in our application! Let's fix that, protecting it with an authentication layer while we're at it.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Protected-Docs">
+<a class="anchor" href="#Protected-Docs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Protected Docs<a class="anchor-link" href="#Protected-Docs"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To implement our documentation, we'll copy the structure of the autogenerated FastAPI documenation while making use of the <code>Depends</code> class. Thanks to FastAPI, we can write a single function that will check for an authenticated user before displaying the documentation. If no user is logged in, it will throw an HTTP 403 error. For more information on FastAPI dependencies, check out the <a href="https://fastapi.tiangolo.com/tutorial/dependencies/">documentation</a>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Try to get the logged in user</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'user'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">user</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">403</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s1">'Could not validate credentials.'</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/openapi.json'</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_open_api_endpoint</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_user</span><span class="p">)):</span>  <span class="c1"># This dependency protects our endpoint!</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">get_openapi</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'FastAPI'</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">routes</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'/docs'</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">'documentation'</span><span class="p">])</span>  <span class="c1"># Tag it as "documentation" for our docs</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_documentation</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_user</span><span class="p">)):</span>  <span class="c1"># This dependency protects our endpoint!</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">get_swagger_ui_html</span><span class="p">(</span><span class="n">openapi_url</span><span class="o">=</span><span class="s1">'/openapi.json'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Documentation'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Check this out: If restart our API and navigate to the documentation page again (<strong>note:</strong> you may need to log in again if your cookie expired), you'll see this awesome documentation page generated by FastAPI!</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/auth_protected_docs.png" width="960">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To illustrate that it's protected, go back to the homepage and logout. Then, manually type in the documentation URL. You should get the HTTP 403 error that we defined!</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/unauth_protected_docs.png" width="480">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And that's it! We successfuly created a FastAPI application with an Google OAuth authentication layer wrapped on top of it!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Credits">
+<a class="anchor" href="#Credits" aria-hidden="true"><span class="octicon octicon-link"></span></a>Credits<a class="anchor-link" href="#Credits"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This tutorial is based on work originally written by Nils de Bruin on <a href="https://medium.com/data-rebels/fastapi-google-as-an-external-authentication-provider-3a527672cf33">Medium</a>. The <code>AuthLib</code> Google OAuth code is adapted from their <a href="https://blog.authlib.org/2020/fastapi-google-login">blog post</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="kmcentush/site"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>The personal site of Kyle McEntush.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/kmcentush" title="kmcentush"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/kymackin" title="kymackin"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
