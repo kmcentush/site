@@ -4,19 +4,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>FastAPI Authentication with Google OAuth - Part 1 | slatebit.com</title>
+<title>FastAPI with Google OAuth - Part 1 | slatebit.com</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="FastAPI Authentication with Google OAuth - Part 1" />
+<meta property="og:title" content="FastAPI with Google OAuth - Part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Using Google OAuth as your authentication layer in FastAPI." />
-<meta property="og:description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<meta name="description" content="Implementing Google OAuth as your authentication layer in FastAPI." />
+<meta property="og:description" content="Implementing Google OAuth as your authentication layer in FastAPI." />
 <link rel="canonical" href="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
 <meta property="og:url" content="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
 <meta property="og:site_name" content="slatebit.com" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-16T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Using Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI Authentication with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
+{"description":"Implementing Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://www.slatebit.com/feed.xml" title="slatebit.com" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -25,19 +25,19 @@
 <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-42486869-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
 
 <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>FastAPI Authentication with Google OAuth - Part 1 | slatebit.com</title>
+<title>FastAPI with Google OAuth - Part 1 | slatebit.com</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="FastAPI Authentication with Google OAuth - Part 1" />
+<meta property="og:title" content="FastAPI with Google OAuth - Part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Using Google OAuth as your authentication layer in FastAPI." />
-<meta property="og:description" content="Using Google OAuth as your authentication layer in FastAPI." />
+<meta name="description" content="Implementing Google OAuth as your authentication layer in FastAPI." />
+<meta property="og:description" content="Implementing Google OAuth as your authentication layer in FastAPI." />
 <link rel="canonical" href="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
 <meta property="og:url" content="https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html" />
 <meta property="og:site_name" content="slatebit.com" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-16T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Using Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI Authentication with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
+{"description":"Implementing Google OAuth as your authentication layer in FastAPI.","@type":"BlogPosting","headline":"FastAPI with Google OAuth - Part 1","url":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html","datePublished":"2020-08-16T00:00:00-05:00","dateModified":"2020-08-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.slatebit.com/fastapi/google/oauth/2020/08/16/fastapi_google_oauth_part1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -99,13 +99,13 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">FastAPI Authentication with Google OAuth - Part 1</h1><p class="page-description">Using Google OAuth as your authentication layer in FastAPI.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-16T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">FastAPI with Google OAuth - Part 1</h1><p class="page-description">Implementing Google OAuth as your authentication layer in FastAPI.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-16T00:00:00-05:00" itemprop="datePublished">
         Aug 16, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
     
     
-      5 min read
+      6 min read
     
 </span></p>
 
@@ -144,7 +144,6 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
-<li class="toc-entry toc-h2"><a href="#Background">Background </a></li>
 <li class="toc-entry toc-h2"><a href="#Google-OAuth-Credentials">Google OAuth Credentials </a></li>
 <li class="toc-entry toc-h2"><a href="#FastAPI">FastAPI </a>
 <ul>
@@ -174,16 +173,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Background">
-<a class="anchor" href="#Background" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background<a class="anchor-link" href="#Background"> </a>
-</h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Coming soon.</p>
+<p>So you want to create a FastAPI application but protect it from unauthorized users. Thanks to Google OAuth and a few Python libraries, it's fairly straightforward to do so!</p>
+<p>The code for the tutorial can be found in this GitHub <a href="https://github.com/kmcentush/fastapi_tutorials">repo</a>. I recommend cloning it as you follow along.</p>
 
 </div>
 </div>
@@ -439,7 +430,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>At this point, we have functioning Google OAuth in our FastAPI application! By starting up our FastAPI application and heading to <a href="http://localhost:8000/">http://localhost:8000/</a> (this is the default url from the <code>uvicorn</code> library; see their <a href="https://www.uvicorn.org/">documentation</a>), we should see the following:</p>
+<p>At this point, we have functioning Google OAuth in our FastAPI application! By starting up our FastAPI application and heading to <a href="http://localhost:8000/">http://localhost:8000/</a> (this is the default URL from the <code>uvicorn</code> library; see their <a href="https://www.uvicorn.org/">documentation</a>), we should see the following:</p>
 
 </div>
 </div>
@@ -455,7 +446,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Clicking the "login" link will take us to the Google OAuth sigin-in page.</p>
+<p>Clicking the login link will take us to the Google OAuth sigin-in page.</p>
 
 </div>
 </div>
@@ -471,7 +462,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>After signing in, we'll be redirected back to our application. Notice that the home page now shows the link to the documentation as well as the the logout link. If you click the logout link, you'll be redirected back to where we started. If you click the documentation link, you'll get a dead link.</p>
+<p>After signing in, we'll be redirected back to our application. Notice that the home page now shows the documentation link as well as the the logout link. If you click the logout link, you'll be redirected back to where we started. If you click the documentation link, you'll get a dead link.</p>
 
 </div>
 </div>
@@ -495,7 +486,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>That's because after disabling FastAPI's autogenerated documentation, we never implemented it in our application! Let's fix that, protecting it with an authentication layer while we're at it.</p>
+<p>That's because after disabling FastAPI's autogenerated documentation, we never reimplemented it in our application! Let's fix that, protecting it with an authentication layer while we're at it.</p>
 
 </div>
 </div>
