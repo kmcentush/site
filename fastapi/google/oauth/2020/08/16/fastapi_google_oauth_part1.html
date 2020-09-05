@@ -91,7 +91,7 @@ window.onload = wrap_img;
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -105,7 +105,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      6 min read
+      8 min read
     
 </span></p>
 
@@ -144,7 +144,13 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
-<li class="toc-entry toc-h2"><a href="#Google-OAuth-Credentials">Google OAuth Credentials </a></li>
+<li class="toc-entry toc-h2"><a href="#Google-OAuth-Credentials">Google OAuth Credentials </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Making-a-New-Project">Making a New Project </a></li>
+<li class="toc-entry toc-h3"><a href="#Configuring-the-OAuth-Consent-Screen">Configuring the OAuth Consent Screen </a></li>
+<li class="toc-entry toc-h3"><a href="#Generating-OAuth-2.0-Client-IDs">Generating OAuth 2.0 Client IDs </a></li>
+</ul>
+</li>
 <li class="toc-entry toc-h2"><a href="#FastAPI">FastAPI </a>
 <ul>
 <li class="toc-entry toc-h3"><a href="#Imports">Imports </a></li>
@@ -173,8 +179,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>So you want to create a FastAPI application but protect it from unauthorized users. Thanks to Google OAuth and a few Python libraries, it's fairly straightforward to do so!</p>
-<p>The code for the tutorial can be found in this GitHub <a href="https://github.com/kmcentush/fastapi_tutorials">repo</a>. I recommend cloning it as you follow along.</p>
+<p>So you want to create a FastAPI application and protect it from unauthorized users. Thanks to Google OAuth and a few Python libraries, it's fairly straightforward to do so!</p>
+<p>The code for the tutorial can be found in this GitHub <a href="https://github.com/kmcentush/fastapi_tutorials/tree/master/google_oauth/part1_integration">repo</a>. I recommend cloning it as you follow along.</p>
 
 </div>
 </div>
@@ -191,7 +197,170 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Coming soon.</p>
+<h3 id="Making-a-New-Project">
+<a class="anchor" href="#Making-a-New-Project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Making a New Project<a class="anchor-link" href="#Making-a-New-Project"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Go to the <a href="https://console.developers.google.com/apis/dashboard">Google API &amp; Services Dashboard</a>. In the top left corner, you'll see the project that you're currently in. Click on the little arrow to bring up the projects list, then click "New Project".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_proj_list.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Fill in your desired project name and click "Create". Once it's done, click to view the project.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_new_proj.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_view_proj.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Configuring-the-OAuth-Consent-Screen">
+<a class="anchor" href="#Configuring-the-OAuth-Consent-Screen" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the OAuth Consent Screen<a class="anchor-link" href="#Configuring-the-OAuth-Consent-Screen"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On the page, click the top left hamburger menu. Navigate to "APIs &amp; Services -&gt; OAuth consent screen".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_nav.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Choose the type that best describes your application, then click "Create". For this tutorial, I'll be using the "external" type.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This page is where you can limit users to logging in only with their authorized emails. For example, if your organization's domain is "company.com", Google would only allow users to login with their "name@company.com" emails. Pretty cool, right?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_consent_type.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On this page, enter in your application requirements. The application name and logo will show when the user logs in to the API, so pick something that you're happy with. You must enter a support email as well. I chose to leave the scopes on their default, as all the API we're building needs is their Google email and profile. I left the rest of the settings on their default for this tutorial and clicked "save".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_consent.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Generating-OAuth-2.0-Client-IDs">
+<a class="anchor" href="#Generating-OAuth-2.0-Client-IDs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Generating OAuth 2.0 Client IDs<a class="anchor-link" href="#Generating-OAuth-2.0-Client-IDs"> </a>
+</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Click on "Credentials" in the sidebar. Then, click "Create Credentials" at the top and select "OAuth client ID".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_cred_type.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Select "Web application" for the type. Fill in the rest of the settings, then click "Create". "Authorized JavaScript origins" limit what sites can forward the user to the Google login, and "authorized redirect URIs" are where Google forwards the user back to after logging in. For this tutorial, I will be developing on my machine and running the application on port 8000 (thus, <a href="http://localhost:8000">http://localhost:8000</a>) and using the <code>auth</code> endpoint to handle the Google -&gt; FastAPI application transaction.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_cred.png" alt=""></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You're just about done setting up OAuth! Once the client is created, copy the client ID and client secret into your .env file. The FastAPI application we're about to build will read this file for the necessary information to handle OAuth. If you're confused about the file structure, check the tutorial <a href="https://github.com/kmcentush/fastapi_tutorials/tree/master/google_oauth/part1_integration">repo</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://raw.githubusercontent.com/kmcentush/fastapi_tutorials/master/google_oauth/part1_integration/imgs/google_oauth_secrets.png" alt=""></p>
 
 </div>
 </div>
@@ -548,7 +717,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Check this out: If restart our API and navigate to the documentation page again (<strong>note:</strong> you may need to log in again if your cookie expired), you'll see this awesome documentation page generated by FastAPI.</p>
+<p>Check this out: if we restart our API and navigate to the documentation page again (<strong>note:</strong> you may need to log in again if your cookie expired), you'll see this awesome documentation page generated by FastAPI.</p>
 
 </div>
 </div>
@@ -633,7 +802,7 @@ window.onload = wrap_img;
         </p>
       </div>
       <div class="footer-col">
-        <p>The personal site of Kyle McEntush.</p>
+        <p>Anything and everything data.</p>
       </div>
     </div>
 
